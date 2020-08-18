@@ -21,7 +21,7 @@ ENV LANG C.UTF-8
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-       bash curl ca-certificates findutils coreutils pwgen \
+       bash curl ca-certificates findutils coreutils pwgen wget \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -44,7 +44,7 @@ LABEL org.opencontainers.image.licenses "(Apache-2.0 AND (GPL-2.0 WITH Classpath
 LABEL org.opencontainers.image.authors "Apache Jena Fuseki by https://jena.apache.org/; this image by https://orcid.org/0000-0001-9842-9718"
 
 # Config and data
-VOLUME /fuseki
+RUN mkdir /fuseki/
 ENV FUSEKI_BASE /fuseki
 
 # Installation folder
@@ -62,6 +62,11 @@ RUN     (curl --location --silent --show-error --fail --retry-connrefused --retr
         rm fuseki.tar.gz* && \
         cd $FUSEKI_HOME && rm -rf fuseki.war && chmod 755 fuseki-server
 
+RUN mkdir $FUSEKI_BASE/extra/ && \
+    wget -O $FUSEKI_BASE/extra/logstash-gelf-1.14.0.jar https://repo1.maven.org/maven2/biz/paluch/logging/logstash-gelf/1.14.0/logstash-gelf-1.14.0.jar && \
+    wget -O $FUSEKI_BASE/extra/kafka-clients-2.1.1.jar https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.1.1/kafka-clients-2.1.1.jar && \
+    wget -O $FUSEKI_BASE/extra/disruptor-3.4.2.jar https://repo1.maven.org/maven2/com/lmax/disruptor/3.4.2/disruptor-3.4.2.jar
+
 # Test the install by testing it's ping resource. 20s sleep because Docker Hub.
 RUN  $FUSEKI_HOME/fuseki-server & \
      sleep 20 && \
@@ -73,6 +78,8 @@ RUN  $FUSEKI_HOME/fuseki-server & \
 COPY shiro.ini $FUSEKI_HOME/shiro.ini
 COPY entrypoint.sh /opt/fuseki/
 RUN chmod 755 /opt/fuseki/entrypoint.sh
+
+COPY log4j2.xml $FUSEKI_HOME/resources/log4j2.xml
 
 # Where we start our server from
 WORKDIR /opt/fuseki

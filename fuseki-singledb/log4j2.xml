@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration packages="biz.paluch.logging.gelf.log4j2">
+  <properties>
+    <Property name="application">${env:APPLICATION}</Property>
+    <Property name="origin">${env:ENVIRONMENT:-dev}</Property>
+    <Property name="kafkaBootstrap">${env:KAFKA_LOGS_BOOTSTRAP:-localhost:9092}</Property>
+  </properties>
+
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout>
+        <Pattern>
+          %d{yyyy-MM-dd HH:mm:ss.SSS} %-5p (%t) %c{1.} %m%n
+        </Pattern>
+      </PatternLayout>
+    </Console>
+
+    <ScriptAppenderSelector name="EnableKafka">
+      <Script language="JavaScript"><![CDATA[
+        java.lang.System.getenv("ENABLE_KAFKA_LOGS").equalsIgnoreCase("true") ? "Kafka" : "Null";]]>
+      </Script>
+      <AppenderSet>
+        <Gelf name="Kafka"
+              host="kafka://${kafkaBootstrap}#${application}"
+              facility="${application}"
+              version="1.1"
+              extractStackTrace="true"
+              filterStackTrace="true"
+              mdcProfiling="true"
+              includeFullMdc="true"
+              maximumMessageSize="8192"
+              originHost="%host{fqdn}">
+            <Field name="timestamp" pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}"/>
+            <Field name="threadName" pattern="%thread"/>
+            <Field name="loggerName" pattern="%c"/>
+            <Field name="message" pattern="%throwable{short.message}"/>
+            <Field name="source" pattern="%host{fqdn}"/>
+            <Field name="_origin" literal="${origin}"/>
+        </Gelf>
+        <Null name="Null" />
+      </AppenderSet>
+    </ScriptAppenderSelector>
+  </Appenders>
+
+  <Loggers>
+    <AsyncRoot level="info">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="EnableKafka" />
+    </AsyncRoot>
+  </Loggers>
+</Configuration>
