@@ -2,7 +2,6 @@
 
 set -e
 
-echo "Indexing triples..."
-java -cp ./fuseki-server.jar jena.textindexer --desc=$DB_CONFIG
+java -cp $FUSEKI_BASE/extra/custom-filters.jar:./fuseki-server.jar jena.textindexer --desc=$DB_CONFIG
 
 $FUSEKI_HOME/fuseki-server --conf=$DB_CONFIG
