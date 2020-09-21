@@ -1,22 +1,14 @@
-# Docker files for Jena
+# Docker files for Jena 3.16
 
 This repository hosts [Docker](https://www.docker.com/) recipes for distributing 
 [Apache Jena](http://jena.apache.org/).
 
 Two Docker images are available:
 
+ - [fuseki-singledb](fuseki-singledb/)  - Based on [fuseki](fuseki/), it's better suited for Kubernetes deployments, since its configuration is supposed to be based on ttl config files instead of environment variables, and the support for starting with multiple databases has been droped. It also has a few additions, including support for GELF Kafka Logs and a custom implementation for the `ConcatenateGraphFilter` Lucene filter.
  - [jena](jena/) - `riot` command line and friends, for use on the command line
  - [fuseki](fuseki/) - the [Fuseki 2](http://jena.apache.org/documentation/fuseki2/) server with SPARQL endpoint and web interface
  
-These are currently available from the Docker Hub as:
-
- - [stain/jena](https://hub.docker.com/r/stain/jena/)
- - [stain/jena-fuseki](https://hub.docker.com/r/stain/jena-fuseki/)
-
-Note that although these Docker images are based on the official Apache Jena releases
-and do not alter them in any way, they do **not** constitute official releases
-from Apache Software Foundation.
-
 ## Building
 
 ```shell
