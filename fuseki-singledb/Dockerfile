@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-ARG FUSEKI_VERSION=3.16.0
+ARG FUSEKI_VERSION=3.17.0
 
 FROM maven:3.6.3-jdk-11 AS lib
 
@@ -24,7 +24,7 @@ WORKDIR /opt/filters/
 ARG FUSEKI_VERSION
 RUN mvn "-Dfuseki.version=$FUSEKI_VERSION" clean package
 
-FROM openjdk:11-jre-slim-buster
+FROM adoptopenjdk:11-jdk-openj9
 
 LABEL maintainer="Elo7 Engineering Team <engenharia@elo7.com.br>"
 
@@ -37,8 +37,8 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # Update below according to https://jena.apache.org/download/ 
-# and checksum for apache-jena-3.x.x.tar.gz.sha512
-ENV FUSEKI_SHA512 17a4c172eb0dc22d1cec71c795c395041fa6dc32be1da8525368abf1e0da51aaaf414c1eca6687b20753d9b4413e0cdc927cff2d5821baedce5e75c762050358
+# and checksum for apache-jena-fuseki-3.x.x.tar.gz.sha512
+ENV FUSEKI_SHA512 2b92f3304743da335f648c1be7b5d7c3a94725ed0a9b5123362c89a50986690114dcef0813e328126b14240f321f740b608cc353417e485c9235476f059bd380
 # No need for https due to sha512 checksums below
 ENV ASF_MIRROR http://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filename=
 ENV ASF_ARCHIVE http://archive.apache.org/dist/
@@ -98,3 +98,4 @@ COPY log4j2.xml $FUSEKI_HOME/resources/log4j2.xml
 WORKDIR /opt/fuseki
 EXPOSE 3030
 ENTRYPOINT ["./entrypoint.sh"]
+
