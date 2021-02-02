@@ -20,6 +20,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-test-framework</artifactId>
             <version>${lucene.version}</version>
+            <scope>test</scope>                 
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
