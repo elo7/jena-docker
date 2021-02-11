@@ -15,15 +15,6 @@
 
 ARG FUSEKI_VERSION=3.17.0
 
-FROM maven:3.6.3-jdk-11 AS lib
-
-COPY custom-lucene-filters/ /opt/filters/
-
-WORKDIR /opt/filters/
-
-ARG FUSEKI_VERSION
-RUN mvn "-Dfuseki.version=$FUSEKI_VERSION" clean package
-
 FROM adoptopenjdk:11-jdk-openj9
 
 LABEL maintainer="Elo7 Engineering Team <engenharia@elo7.com.br>"
@@ -78,8 +69,6 @@ RUN mkdir $FUSEKI_BASE/extra/ && \
     wget -O $FUSEKI_BASE/extra/kafka-clients-2.1.1.jar https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.1.1/kafka-clients-2.1.1.jar && \
     wget -O $FUSEKI_BASE/extra/disruptor-3.4.2.jar https://repo1.maven.org/maven2/com/lmax/disruptor/3.4.2/disruptor-3.4.2.jar
 
-COPY --from=lib /opt/filters/target/custom-filters-*.jar $FUSEKI_BASE/extra/custom-filters.jar
-
 # Test the install by testing it's ping resource. 20s sleep because Docker Hub.
 RUN  $FUSEKI_HOME/fuseki-server & \
      sleep 20 && \
@@ -88,7 +77,6 @@ RUN  $FUSEKI_HOME/fuseki-server & \
 # As "localhost" is often inaccessible within Docker container,
 # we'll enable basic-auth with a random admin password
 # (which we'll generate on start-up)
-COPY shiro.ini $FUSEKI_HOME/shiro.ini
 COPY entrypoint.sh /opt/fuseki/
 RUN chmod 755 /opt/fuseki/entrypoint.sh
 
