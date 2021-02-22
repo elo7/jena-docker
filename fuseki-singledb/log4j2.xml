@@ -4,6 +4,7 @@
     <Property name="application">${env:APPLICATION}</Property>
     <Property name="origin">${env:ENVIRONMENT:-dev}</Property>
     <Property name="kafkaBootstrap">${env:KAFKA_LOGS_BOOTSTRAP:-localhost:9092}</Property>
+    <Property name="loggingLevelRoot" value="${LOGGING_LEVEL_ROOT:-WARN}" />
   </properties>
 
   <Appenders>
@@ -43,7 +44,7 @@
   </Appenders>
 
   <Loggers>
-    <AsyncRoot level="info">
+    <AsyncRoot level="${loggingLevelRoot}">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="EnableKafka" />
     </AsyncRoot>
